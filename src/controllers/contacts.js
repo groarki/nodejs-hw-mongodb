@@ -11,11 +11,13 @@ import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
 
 export const getAllContactsController = async (req, res) => {
+  const { _id: userId } = req.user;
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = parseSortParams(req.query);
   const filter = parseFilterParams(req.query);
 
   const contacts = await getAllContacts({
+    userId,
     page,
     perPage,
     sortBy,
@@ -32,7 +34,8 @@ export const getAllContactsController = async (req, res) => {
 
 export const getContactController = async (req, res) => {
   const { contactId } = req.params;
-  const contact = await getContact(contactId);
+  const { _id: userId } = req.user;
+  const contact = await getContact(contactId, userId);
 
   if (!contact) {
     throw createHttpError(404, 'Contact not found');
@@ -46,7 +49,8 @@ export const getContactController = async (req, res) => {
 };
 
 export const createContactController = async (req, res) => {
-  const newContact = await createContact(req.body);
+  const { _id: userId } = req.user;
+  const newContact = await createContact(req.body, userId);
 
   res.status(201).json({
     status: 201,
@@ -57,7 +61,10 @@ export const createContactController = async (req, res) => {
 
 export const upsertContactController = async (req, res) => {
   const { contactId } = req.params;
-  const result = await upsertContact(contactId, req.body, { upsert: true });
+  const { _id: userId } = req.user;
+  const result = await upsertContact(contactId, req.body, userId, {
+    upsert: true,
+  });
 
   if (!result) {
     throw createHttpError(404, 'Contact not found');
@@ -74,8 +81,9 @@ export const upsertContactController = async (req, res) => {
 
 export const deleteContactController = async (req, res, next) => {
   const { contactId } = req.params;
+  const { _id: userId } = req.user;
 
-  const deletedContact = await deleteContact(contactId);
+  const deletedContact = await deleteContact(contactId, userId);
 
   if (!deletedContact) {
     throw createHttpError(404, 'Contact not found');

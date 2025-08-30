@@ -1,8 +1,10 @@
 import { ContactsCollection } from '../db/models/contactsModel.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 import { SORT_ORDER } from '../constants/index.js';
+import createHttpError from 'http-errors';
 
 export const getAllContacts = async ({
+  userId,
   page = 1,
   perPage = 10,
   sortBy = '_id',
@@ -12,7 +14,7 @@ export const getAllContacts = async ({
   const skip = (page - 1) * perPage;
   const limit = perPage;
 
-  const contactsQuery = ContactsCollection.find();
+  const contactsQuery = ContactsCollection.find({ userId });
 
   if (filter.type) {
     contactsQuery.where('contactType').equals(filter.type);
@@ -37,21 +39,25 @@ export const getAllContacts = async ({
   };
 };
 
-export const getContact = async (contactId) => {
-  const contact = await ContactsCollection.findById(contactId);
-  console.log(contact);
+export const getContact = async (contactId, userId) => {
+  const contact = await ContactsCollection.findOne({ _id: contactId, userId });
+
+  if (!contact)
+    throw createHttpError(404, `Contact from user${userId} not found`);
+
   return contact;
 };
 
-export const createContact = async (body) => {
-  const newContact = await ContactsCollection.create(body);
+export const createContact = async (body, userId) => {
+  const newContact = await ContactsCollection.create({ ...body, userId });
   return newContact;
 };
 
-export const upsertContact = async (contactId, body, options = {}) => {
+export const upsertContact = async (contactId, body, userId, options = {}) => {
   const updatesContact = await ContactsCollection.findOneAndUpdate(
     {
       _id: contactId,
+      userId,
     },
     body,
     { new: true, includeResultMetadata: true, ...options },
@@ -64,9 +70,10 @@ export const upsertContact = async (contactId, body, options = {}) => {
   };
 };
 
-export const deleteContact = async (contactId) => {
+export const deleteContact = async (contactId, userId) => {
   const deletedContact = await ContactsCollection.findOneAndDelete({
     _id: contactId,
+    userId,
   });
 
   return deletedContact;
