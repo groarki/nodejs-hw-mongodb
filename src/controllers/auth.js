@@ -12,7 +12,7 @@ const setupSession = (res, session) => {
     httpOnly: true,
     expires: new Date(Date.now() + ONE_MONTH),
   });
-  res.cookie('sessionId', session._id, {
+  res.cookie('sessionId', session._id.toString(), {
     httpOnly: true,
     expires: new Date(Date.now() + ONE_MONTH),
   });
@@ -43,16 +43,20 @@ export const loginUserController = async (req, res) => {
 };
 
 export const refreshSessionController = async (req, res) => {
-  const session = await refreshSession({
-    sessionId: req.cookie.sessionId,
-    refreshToken: req.cookie.refreshToken,
-  });
+  const refreshToken = req.cookies.refreshToken;
+  const sessionId = req.cookies.sessionId;
+
+  if (!refreshToken || !sessionId) {
+    return res.status(401).json({ message: 'No refresh token or session' });
+  }
+
+  const session = await refreshSession({ sessionId, refreshToken });
 
   setupSession(res, session);
 
   res.json({
     status: 200,
-    message: 'Successfully refreshed a session!',
+    message: 'Successfully refreshed session!',
     data: {
       accessToken: session.accessToken,
     },
@@ -60,8 +64,8 @@ export const refreshSessionController = async (req, res) => {
 };
 
 export const logoutUserController = async (req, res) => {
-  if (req.cookie.sessionId) {
-    await logoutUser(req.sessionId);
+  if (req.cookies.sessionId) {
+    await logoutUser(req.cookies.sessionId);
   }
   res.clearCookie('sessionId');
   res.clearCookie('refreshToken');
