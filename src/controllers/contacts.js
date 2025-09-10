@@ -1,6 +1,6 @@
 import {
   getAllContacts,
-  getContact,
+  getContactbyId,
   createContact,
   upsertContact,
   deleteContact,
@@ -38,7 +38,7 @@ export const getAllContactsController = async (req, res) => {
 export const getContactController = async (req, res) => {
   const { contactId } = req.params;
   const { _id: userId } = req.user;
-  const contact = await getContact(contactId, userId);
+  const contact = await getContactbyId(contactId, userId);
 
   if (!contact) {
     throw createHttpError(404, 'Contact not found');
