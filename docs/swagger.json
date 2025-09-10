@@ -219,6 +219,7 @@
                   "photo": {
                     "description": "Link to Contact's photo",
                     "type": "string",
+                    "format": "binary",
                     "example": "https://www.example.com/photo.jpg"
                   },
                   "userId": {
@@ -386,6 +387,7 @@
                   "photo": {
                     "description": "Link to Contact's photo",
                     "type": "string",
+                    "format": "binary",
                     "example": "https://www.example.com/photo.jpg"
                   }
                 }
@@ -543,6 +545,7 @@
           "photo": {
             "description": "Link to Contact's photo",
             "type": "string",
+            "format": "binary",
             "example": "https://www.example.com/photo.jpg"
           },
           "userId": {

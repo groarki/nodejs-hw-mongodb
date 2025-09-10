@@ -44,6 +44,7 @@ requestBody:
           photo:
             description: "Link to Contact's photo"
             type: string
+            format: binary
             example: 'https://www.example.com/photo.jpg'
           userId:
             description: 'Id of the user who owns this contact'
