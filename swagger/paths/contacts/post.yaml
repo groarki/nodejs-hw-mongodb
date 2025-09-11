@@ -17,10 +17,6 @@ requestBody:
           - contactType
           - userId
         properties:
-          _id:
-            description: "Contact's id"
-            type: string
-            example: 65e4decdd286b30065d54af9
           name:
             description: "Contact's name"
             type: string
@@ -46,10 +42,6 @@ requestBody:
             type: string
             format: binary
             example: 'https://www.example.com/photo.jpg'
-          userId:
-            description: 'Id of the user who owns this contact'
-            type: string
-            example: 65e4decdd286b30065d54af9
 responses:
   '201':
     description: Creates a contact
